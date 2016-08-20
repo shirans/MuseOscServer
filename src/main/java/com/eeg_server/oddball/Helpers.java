@@ -10,14 +10,13 @@ import java.util.concurrent.CountDownLatch;
  * @auter shiran on 20/08/2016.
  */
 public class Helpers {
-    public static void playSound(String file,CountDownLatch wait) {
+    public static void playSound(String file, EventListener listener) {
         try {
             Clip clip = AudioSystem.getClip();
             AudioInputStream inputStream = AudioSystem.getAudioInputStream(
                     RunExperiment.class.getResourceAsStream(file));
             clip.open(inputStream);
-            LineListener lineListener = new EventListener(wait);
-            clip.addLineListener(lineListener);
+            clip.addLineListener(listener);
             clip.start();
         } catch (Exception e) {
             e.printStackTrace();

@@ -13,7 +13,8 @@ Configuration:
   Loggers:
     Logger:
       name: com.eeg_server
-      level: trace
+      additivity: fales
+      level: debug
       AppenderRef:
               ref: Console
     Root:

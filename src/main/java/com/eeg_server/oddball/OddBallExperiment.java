@@ -3,8 +3,6 @@ package com.eeg_server.oddball;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.sound.sampled.*;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @auter shiran on 20/08/2016.
@@ -12,14 +10,15 @@ import java.util.concurrent.CountDownLatch;
 public class OddBallExperiment {
 
     private static final Logger logger = LogManager.getLogger(OddBallExperiment.class);
-    private static boolean isFinished = false;
+    static Boolean isFinished = false;
 
 
     public void start() {
-        new PlayingThread(isFinished).run();
+        PlayingThread playingThread = new PlayingThread();
+        playingThread.start();
     }
 
-    public boolean isFinished() {
+    public Boolean isFinished() {
         return isFinished;
     }
 
