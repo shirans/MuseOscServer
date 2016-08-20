@@ -12,7 +12,7 @@ Configuration:
 
   Loggers:
     Logger:
-      name: com.museServer
+      name: com.eeg_server
       level: trace
       AppenderRef:
               ref: Console
