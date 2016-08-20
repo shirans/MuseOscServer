@@ -1,14 +1,21 @@
 Configuration:
-  status: debug
+  status: warn
 
   Appenders:
+#    leve: warn
     Console:
       name: Console
       target: SYSTEM_OUT
       PatternLayout:
+#      %highlight{%d [%t] %-5level: %msg%n%throwable}
         Pattern: "%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
 
   Loggers:
+    Logger:
+      name: com.museServer
+      level: trace
+      AppenderRef:
+              ref: Console
     Root:
       level: error
       AppenderRef:
