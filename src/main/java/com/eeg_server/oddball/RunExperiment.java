@@ -1,15 +1,12 @@
 package com.eeg_server.oddball;
 
-import javax.sound.sampled.*;
-import java.util.concurrent.CountDownLatch;
-
 import com.eeg_server.eegServer.EegServer;
 import com.eeg_server.eegServer.MuseEegServer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * @author  shiran on 13/08/2016.
+ * @author shiran on 13/08/2016.
  */
 public class RunExperiment {
     private static final Logger logger = LogManager.getLogger(RunExperiment.class);
