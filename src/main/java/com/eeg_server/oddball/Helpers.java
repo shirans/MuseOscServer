@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import javax.sound.sampled.Clip;
 
 /**
- * @auter shiran on 20/08/2016.
+ * @auter Shiran Schwartz on 20/08/2016.
  */
 class Helpers {
 

@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @auter shiran on 20/08/2016.
+ * @auter Shiran Schwartz on 20/08/2016.
  */
 public class FileUtil {
 

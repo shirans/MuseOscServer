@@ -167,7 +167,7 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 		parent = theParent;
 		_myOscProperties = new OscProperties();
 
-		registerDispose(parent);
+		//registerDispose(parent);
 
 		switch (theMode) {
 		case (MULTICAST):

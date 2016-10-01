@@ -27,8 +27,9 @@ public class MuseEegServer implements EegServer {
     private OscP5 oscP5;
     private List<String> messages = Lists.newLinkedList();
 
+    @Override
     public void startRecord() {
-        this.oscP5 = new OscP5(this, "10.0.0.6",5001, OscProperties.MULTICAST);
+        this.oscP5 = new OscP5(this, "10.0.0.6", 5001, OscProperties.UDP);
         logger.info("MuseEegServer starts recording");
     }
 
@@ -38,20 +39,26 @@ public class MuseEegServer implements EegServer {
         out.append(" , ");
 
         if (msg.checkAddrPattern("/muse/eeg")) {
-            out.append(System.currentTimeMillis()).append(": ");
-            out.append("Left Ear:").append(msg.get(0).floatValue()).append("\t");
-            out.append("Left Forehead:").append(msg.get(1).floatValue()).append("\t");
-            out.append("Forehead:").append(msg.get(2).floatValue()).append("\t");
-            out.append("Right Ear:").append(msg.get(3).floatValue());
-            messages.add(out.toString());
+            eegData(msg, out);
         }
+        messages.add(out.toString());
+
     }
 
+    private void eegData(OscMessage msg, StringBuilder out) {
+        out.append("Left Ear: ").append(msg.get(0).floatValue()).append("\t");
+        out.append("Left Forehead: ").append(msg.get(1).floatValue()).append("\t");
+        out.append("Forehead :").append(msg.get(2).floatValue()).append("\t");
+        out.append("Right Ear: ").append(msg.get(3).floatValue());
+    }
+
+    @Override
     public void stopRecord() {
         oscP5.dispose();
         logger.info("MuseEegServer stops recording");
     }
 
+    @Override
     public void close() {
 
     }
@@ -70,5 +77,11 @@ public class MuseEegServer implements EegServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
     }
+
+
+    // how to process brain waves: https://github.com/shevek/dblx/blob/4734d4617bc042895a28b14d26fc53fd780a9018/dblx-iface-muse/src/main/java/org/anarres/dblx/iface/muse/net/MuseConnect.java
+
 }

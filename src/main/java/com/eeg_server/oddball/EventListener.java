@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @auter shiran on 20/08/2016.
+ * @auter Shiran Schwartz on 20/08/2016.
  */
 class EventListener implements LineListener {
 

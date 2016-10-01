@@ -13,7 +13,7 @@ import java.util.Random;
 import static com.eeg_server.oddball.Helpers.playSoundAudioSystem;
 
 /**
- * @auter shiran on 20/08/2016.
+ * @auter Shiran Schwartz on 20/08/2016.
  */
 class PlayingThread extends Thread {
 
@@ -84,7 +84,6 @@ class PlayingThread extends Thread {
         logger.debug("starting to wait");
         lineListener.await();
         logger.debug("woke up");
-
     }
 
     public Queue<Pair<Long, Type>> getEvents() {
