@@ -4,6 +4,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import java.util.Queue;
@@ -17,28 +18,33 @@ class EventListener implements LineListener {
 
     private static final Logger logger = LogManager.getLogger(EventListener.class);
     private final Queue<Pair<Long, Type>> events;
+    private static Clip currentLine;
 
     public void setWaitNext(CountDownLatch waitNext) {
         this.waitNext = waitNext;
     }
 
-    private CountDownLatch waitNext;
+    CountDownLatch waitNext;
     private static Type currentType = Type.Frequent;
 
     static void setCurrentType(Type currentType) {
         EventListener.currentType = currentType;
     }
+    static void setCurrentLine(Clip line){
+        currentLine = line;
+    }
 
     EventListener() {
         this.waitNext = new CountDownLatch(1);
-        this.events = new LinkedBlockingQueue<Pair<Long, Type>>();
+        this.events = new LinkedBlockingQueue<>();
     }
 
+    @Override
     public void update(LineEvent event) {
-        logger.info(event.getType().toString());
-        if (event.getType() == LineEvent.Type.STOP) {
-            logger.info("closed");
+        logger.info("got an update:" + event.getType().toString());
+        if (event.getLine().equals(currentLine) && event.getType() == LineEvent.Type.STOP) {
             events.add(Pair.of(System.currentTimeMillis(), currentType));
+            logger.info("counting down:" + events.size());
             waitNext.countDown();
         }
     }
@@ -50,6 +56,7 @@ class EventListener implements LineListener {
     public void await() {
         try {
             this.waitNext.await();
+            this.waitNext = new CountDownLatch(1);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

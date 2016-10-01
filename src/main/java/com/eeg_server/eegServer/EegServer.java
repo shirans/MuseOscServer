@@ -10,4 +10,8 @@ public interface EegServer {
     void stopRecord();
 
     void close();
+
+    int getEventsSize();
+
+    void dumpResults();
 }

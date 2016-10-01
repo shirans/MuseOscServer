@@ -172,7 +172,7 @@ public class OscArgument {
      * @return String
      */
     public String toString() {
-        return ((String) value);
+        return ((String.valueOf(value)));
     }
 
     /**

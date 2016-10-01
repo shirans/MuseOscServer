@@ -2,6 +2,7 @@ package com.eeg_server;
 
 import com.eeg_server.oscP5.OscMessage;
 import com.eeg_server.oscP5.OscP5;
+import com.eeg_server.oscP5.OscProperties;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -13,12 +14,12 @@ import java.util.Date;
 public class MuseOscServer {
     private static MuseOscServer museOscServer;
     private DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss.SSS");
-    private OscP5 museServer;
     private static int recvPort = 5001;
+    private OscP5 museServer;
 
     public static void main(String[] args) {
         museOscServer = new MuseOscServer();
-        museOscServer.museServer = new OscP5(museOscServer, recvPort);
+        museOscServer.museServer = new OscP5(museOscServer, "10.0.0.6", 5001, OscProperties.MULTICAST);
     }
 
     void oscEvent(OscMessage msg) {
@@ -28,21 +29,13 @@ public class MuseOscServer {
 
         if (msg.checkAddrPattern("/muse/eeg")) {
             eegData(msg, out);
-//        if (msg.checkAddrPattern("/muse/elements/alpha_relative")) {
-//            alphaRelative(msg, out);
+
 //            System.out.println(out.toString());
-//        }
-            System.out.println(out.toString());
         }
     }
 
-    private void alphaRelative(OscMessage msg, StringBuilder out) {
-//        out.append(format.format(new Date(new Long(msg.get(4).intValue()) * 1000 +
-//                new Double(msg.get(5).intValue() * 0.001).intValue()))).append("\t");
-        out.append("Left Ear: ").append(msg.get(0).floatValue()).append("\t");
-        out.append("Left Forehead: ").append(msg.get(1).floatValue()).append("\t");
-        out.append("Forehead :").append(msg.get(2).floatValue()).append("\t");
-        out.append("Right Ear: ").append(msg.get(3).floatValue());
+    void registerDispose() {
+        System.out.println("registerDispose");
     }
 
 

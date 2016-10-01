@@ -136,7 +136,6 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 	 * @usage Application
 	 */
 	public OscP5(final Object theParent, final OscProperties theProperties) {
-		welcome();
 		parent = theParent;
 
 		registerDispose(parent);
@@ -165,7 +164,6 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 	 * @usage Application
 	 */
 	public OscP5(final Object theParent, final String theAddress, final int thePort, final int theMode) {
-		welcome();
 		parent = theParent;
 		_myOscProperties = new OscProperties();
 
@@ -197,7 +195,6 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 	}
 
 	public OscP5(final Object theParent, final int theReceiveAtPort, final int theMode) {
-		welcome();
 		parent = theParent;
 
 		registerDispose(parent);
@@ -227,17 +224,12 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 	 * @usage Application
 	 */
 	public OscP5(final Object theParent, final int theReceiveAtPort) {
-		welcome();
 		parent = theParent;
 
 		registerDispose(parent);
 
 		initUDP(theReceiveAtPort);
 		isEventMethod = checkEventMethod();
-	}
-
-	private void welcome() {
-		System.out.println("OscP5 " + VERSION + " " + "infos, comments, questions at http://www.sojamo.de/oscP5\n\n");
 	}
 
 	private void registerDispose(Object theObject) {
@@ -876,7 +868,6 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 	 * @invisible
 	 */
 	public OscP5(final Object theParent, final String theHost, final int theSendToPort, final int theReceiveAtPort, final String theMethodName) {
-		welcome();
 		parent = theParent;
 
 		registerDispose(parent);
@@ -919,16 +910,6 @@ public class OscP5 implements UdpPacketListener, TcpPacketListener {
 	 * @invisible
 	 */
 	public void disconnectFromTEMP() {
-	}
-
-	/**
-	 * @deprecated
-	 * @param theParent Object
-	 * @param theAddress String
-	 * @param thePort int
-	 */
-	public OscP5(final Object theParent, final String theAddress, final int thePort) {
-		this(theParent, theAddress, thePort, OscProperties.MULTICAST);
 	}
 
 }
