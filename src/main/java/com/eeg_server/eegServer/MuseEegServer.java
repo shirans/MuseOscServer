@@ -4,7 +4,6 @@ import com.eeg_server.oddball.FileUtil;
 import com.eeg_server.oddball.OddBallExperiment;
 import com.eeg_server.oscP5.OscMessage;
 import com.eeg_server.oscP5.OscP5;
-import com.eeg_server.oscP5.OscProperties;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,13 +26,19 @@ public class MuseEegServer implements EegServer {
     private OscP5 oscP5;
     private List<String> messages = Lists.newLinkedList();
 
+
+    public static void main(String args[]) throws InterruptedException {
+        new MuseEegServer().startRecord();
+    }
+
     @Override
     public void startRecord() {
-        this.oscP5 = new OscP5(this, "10.0.0.6", 5001, OscProperties.UDP);
+        this.oscP5 = new OscP5(this,5001);
         logger.info("MuseEegServer starts recording");
     }
 
     void oscEvent(OscMessage msg) {
+        logger.debug("got message:" + msg);
         StringBuilder out = new StringBuilder();
         out.append(msg);
         out.append(" , ");
@@ -71,14 +76,11 @@ public class MuseEegServer implements EegServer {
     @Override
     public void dumpResults() {
         String path = FileUtil.getPath();
-
         try {
             Files.write(Paths.get(path).resolve("EegData"), messages);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
 
