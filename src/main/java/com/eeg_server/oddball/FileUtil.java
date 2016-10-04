@@ -30,6 +30,7 @@ public class FileUtil {
                     if (!created) {
                         logger.error("could not create a new dir:" + path);
                     }
+                    init = true;
                 }
             }
         }

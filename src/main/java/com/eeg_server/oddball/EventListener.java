@@ -41,10 +41,8 @@ class EventListener implements LineListener {
 
     @Override
     public void update(LineEvent event) {
-        logger.info("got an update:" + event.getType().toString());
         if (event.getLine().equals(currentLine) && event.getType() == LineEvent.Type.STOP) {
             events.add(Pair.of(System.currentTimeMillis(), currentType));
-            logger.info("counting down:" + events.size());
             waitNext.countDown();
         }
     }

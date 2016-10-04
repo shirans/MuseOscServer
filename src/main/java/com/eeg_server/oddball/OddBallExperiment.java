@@ -26,9 +26,9 @@ public class OddBallExperiment {
 
     private PlayingThread playingThread;
 
-    public void start() {
+    public void start(int sleepFactor, int numIterations) {
         logger.info("starting Playing thread");
-        playingThread = new PlayingThread();
+        playingThread = new PlayingThread(sleepFactor, numIterations);
         this.events = playingThread.getEvents();
         playingThread.start();
     }

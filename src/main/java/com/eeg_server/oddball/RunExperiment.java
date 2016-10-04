@@ -17,12 +17,13 @@ public class RunExperiment {
 
     public static void main(String args[]) throws InterruptedException, IOException {
         System.setProperty("java.awt.headless", "true");
+        int sleepFactor = 2;
+        int numIterations = 10;
         EegServer server = new MuseEegServer();
         OddBallExperiment experiment = new OddBallExperiment();
         server.startRecord();
-        experiment.start();
+        experiment.start(sleepFactor, numIterations);
         while (!experiment.isFinished()) {
-            logger.info("not ended");
             logger.info("num sound events:"+ experiment.getEventsSize());
             logger.info("eeg messages:"+ server.getEventsSize());
             Thread.sleep(2000);

@@ -24,7 +24,7 @@
  */
 
 /**
- * StringUtils Contains some basic utility methods for handling Strings.
+ * StringUtils Contains some basic utility methods for handling Type.
  *
  * Copyright (C) 2003 Johan K�nng�rd
  * Contains code Copyright (C) 2001,2002 Stephen Ostermiller
@@ -258,12 +258,12 @@ public class StringUtils extends Object {
 	}
 
 	/**
-	 * Splits a string at the specified lengths and returns an array of Strings.
+	 * Splits a string at the specified lengths and returns an array of Type.
 	 *
 	 * @param source
 	 *            the String to split.
 	 * @lengths an array of lengths where to split the String.
-	 * @return an array of Strings with the same number of elements as the
+	 * @return an array of Type with the same number of elements as the
 	 *         number of elements in the lengths argument. The length of each
 	 *         String element is specified by the correspondent lengths array
 	 *         element.

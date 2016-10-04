@@ -14,11 +14,9 @@ class Helpers {
 
     static void playSoundAudioSystem(Clip clip, EventListener listener) {
         try {
-            logger.info("status:" + clip.isActive());
             clip.setFramePosition(0);
             clip.addLineListener(listener);
             clip.start();
-            logger.info("started: to play");
         } catch (Exception e) {
             e.printStackTrace();
         }
