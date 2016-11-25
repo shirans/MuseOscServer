@@ -66,7 +66,9 @@ public class MuseSignals {
 
     }
 
-    public static String asString(long currTime, Object[] arguments, Type t) {
-        return currTime + "," +  t.name() + "," + asString(arguments);
+    public static String asString(OscMessage msg, Type t) {
+        long timetag = msg.timetag();
+        long time = (timetag !=0) ? timetag : System.currentTimeMillis();
+        return String.format("%d,%s,%s",time,t.name(),asString(msg.arguments()));
     }
 }
