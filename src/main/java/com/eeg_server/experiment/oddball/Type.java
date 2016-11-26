@@ -1,4 +1,4 @@
-package com.eeg_server.oddball;
+package com.eeg_server.experiment.oddball;
 
 /**
  * @auter shiran on 20/08/2016.

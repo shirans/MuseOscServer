@@ -1,6 +1,7 @@
 package com.eeg_server.eegServer;
 
 import com.eeg_server.oscP5.OscMessage;
+import com.eeg_server.utils.TimeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Strings;
@@ -67,8 +68,6 @@ public class MuseSignals {
     }
 
     public static String asString(OscMessage msg, Type t) {
-        long timetag = msg.timetag();
-        long time = (timetag !=0) ? timetag : System.currentTimeMillis();
-        return String.format("%d,%s,%s",time,t.name(),asString(msg.arguments()));
+        return String.format("%s,%s,%s", TimeUtils.getNTPtimeString(msg.timetag()),t.name(),asString(msg.arguments()));
     }
 }

@@ -1,22 +1,21 @@
 package com.eeg_server.eegServer;
 
-import com.eeg_server.oddball.FileUtil;
-import com.eeg_server.oddball.OddBallExperiment;
+import com.eeg_server.experiment.ExperimentType;
+import com.eeg_server.experiment.oddball.FileUtils;
+import com.eeg_server.experiment.oddball.OddBallExperiment;
 import com.eeg_server.oscP5.OscMessage;
 import com.eeg_server.oscP5.OscP5;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static com.eeg_server.utils.TimeUtils.*;
+import static com.eeg_server.experiment.oddball.FileUtils.NEW_LINE;
 
 /**
  * @auter shiran on 20/08/2016.
@@ -24,8 +23,9 @@ import static com.eeg_server.utils.TimeUtils.*;
 public class MuseEegServer implements EegServer {
 
     private static final Logger logger = LogManager.getLogger(OddBallExperiment.class);
+    private static final String HEADER = "Timetag Ntp,Server Timestamp,Raw Timetag, Raw Server Timestamp,Data Type,data";
     private OscP5 oscP5;
-    private List<String> messages = Lists.newLinkedList();
+    private List<EegData> messages = Lists.newLinkedList();
 
 
     public static void main(String args[]) throws InterruptedException {
@@ -47,47 +47,29 @@ public class MuseEegServer implements EegServer {
     }
 
     void oscEvent(OscMessage msg) {
-        long timetag = msg.timetag();
-        String epocTimeMSHack = timeConversionHackString(timetag);
-        String epocMsSpeck = convertOscTimeTagBySpecString(timetag);
-        String serverCurrentTimestamp = currentMilliString();
-        String ntp = getNTPtimeString(timetag);
-
-        logger.info("hack timestamp: " + epocTimeMSHack);
-        logger.info("current timestamp: " + serverCurrentTimestamp);
-        logger.info("epocMsSpeck: " + epocMsSpeck);
-        logger.info("ntp: " + ntp);
-
-
-
         Type type = Type.getValue(msg.addrPattern());
-//        SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-//        logger.info(f.format(msg.timetag()) + msg.addrPattern());
 
         String msgToAdd = null;
         switch (type) {
             case OTHER:
                 return;
-            case EEG:
-                msgToAdd = MuseSignals.asString(msg, Type.EEG);
-                break;
             case HORSE_SHOE:
                 logger.info("signal quality:" + MuseSignals.asString(msg, Type.HORSE_SHOE));
-                break;
-            case STRICT:
-                logger.info("is good: " + MuseSignals.asString(msg, Type.STRICT));
+                return;
             case QUANTIZATION_EEG:
                 logger.info("device Quantization:" + MuseSignals.parseQuantization(msg));
+                return;
+            case STRICT:
+                logger.info("is good: " + MuseSignals.asString(msg, Type.STRICT));
+                return;
+            case EEG:
+                long timetag = msg.timetag();
+                long serverCurrentTimestamp = System.currentTimeMillis();
+                EegData data = new EegData(Type.EEG.name(), timetag, serverCurrentTimestamp, msg.arguments());
+                messages.add(data);
                 break;
         }
-
-        if (Strings.isNotEmpty(msgToAdd)) {
-            messages.add(msgToAdd);
-        }
     }
-
-
-
 
     @Override
     public void stopRecord() {
@@ -107,12 +89,21 @@ public class MuseEegServer implements EegServer {
 
     @Override
     public void dumpResults() {
-        String path = FileUtil.getPath();
-        logger.info("saving results to path:" + path);
+        String fileName = FileUtils.resolve("EegData.csv").toString();
+        logger.info("writing data to file at path: %s", fileName);
         try {
-            Files.write(Paths.get(path).resolve("EegData"), messages);
+            FileWriter writer = new FileWriter(fileName);
+            writer.write(HEADER);
+            writer.write(NEW_LINE);
+            for (EegData eegData : messages) {
+                writer.append(FileUtils.formatCsvLine(eegData));
+                writer.append(NEW_LINE);
+            }
+            writer.flush();
+            writer.close();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("could not write to path: %s", fileName, e);
         }
     }
 

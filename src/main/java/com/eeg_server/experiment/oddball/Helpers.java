@@ -1,4 +1,4 @@
-package com.eeg_server.oddball;
+package com.eeg_server.experiment.oddball;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

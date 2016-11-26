@@ -1,4 +1,4 @@
-package com.eeg_server.oddball;
+package com.eeg_server.experiment.oddball;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;

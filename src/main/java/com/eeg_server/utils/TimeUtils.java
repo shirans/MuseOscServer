@@ -58,6 +58,10 @@ public class TimeUtils {
         return FORMAT.format(System.currentTimeMillis());
     }
 
+    public static String format(long time) {
+        return FORMAT.format(time);
+    }
+
     public static long getNTPtime(long timetag) {
         return new org.apache.commons.net.ntp.TimeStamp(timetag).getTime();
     }
