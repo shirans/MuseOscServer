@@ -1,7 +1,7 @@
 package com.eeg_server.eegServer;
 
 /**
- * @auter shiran Schwartz on 26/11/2016.
+ * @Author shiran Schwartz on 26/11/2016.
  */
 public class EegData {
     public long getTimeTagNtp() {

@@ -3,7 +3,7 @@ package com.eeg_server.utils;
 import java.text.SimpleDateFormat;
 
 /**
- * @auter shiran Schwartz on 25/11/2016.
+ * @author shiran Schwartz on 25/11/2016.
  */
 public class SyncDateTimeFormatter {
     private SimpleDateFormat dateTimeFormatter;

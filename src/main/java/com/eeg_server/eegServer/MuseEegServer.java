@@ -1,6 +1,5 @@
 package com.eeg_server.eegServer;
 
-import com.eeg_server.experiment.ExperimentType;
 import com.eeg_server.experiment.oddball.FileUtils;
 import com.eeg_server.experiment.oddball.OddBallExperiment;
 import com.eeg_server.oscP5.OscMessage;
@@ -18,7 +17,7 @@ import java.util.List;
 import static com.eeg_server.experiment.oddball.FileUtils.NEW_LINE;
 
 /**
- * @auter shiran on 20/08/2016.
+ * @author shiran on 20/08/2016.
  */
 public class MuseEegServer implements EegServer {
 
@@ -54,7 +53,7 @@ public class MuseEegServer implements EegServer {
             case OTHER:
                 return;
             case HORSE_SHOE:
-                logger.info("signal quality:" + MuseSignals.asString(msg, Type.HORSE_SHOE));
+//                logger.info("signal quality:" + MuseSignals.asString(msg, Type.HORSE_SHOE));
                 return;
             case QUANTIZATION_EEG:
                 logger.info("device Quantization:" + MuseSignals.parseQuantization(msg));
@@ -63,11 +62,11 @@ public class MuseEegServer implements EegServer {
                 logger.info("is good: " + MuseSignals.asString(msg, Type.STRICT));
                 return;
             case EEG:
+            default:
                 long timetag = msg.timetag();
                 long serverCurrentTimestamp = System.currentTimeMillis();
-                EegData data = new EegData(Type.EEG.name(), timetag, serverCurrentTimestamp, msg.arguments());
+                EegData data = new EegData(type.name(), timetag, serverCurrentTimestamp, msg.arguments());
                 messages.add(data);
-                break;
         }
     }
 
@@ -88,9 +87,9 @@ public class MuseEegServer implements EegServer {
     }
 
     @Override
-    public void dumpResults() {
-        String fileName = FileUtils.resolve("EegData.csv").toString();
-        logger.info("writing data to file at path: %s", fileName);
+    public void dumpResults(String filename) {
+        String fileName = FileUtils.resolve(filename + ".csv").toString();
+        logger.info(String.format("writing data to file at path: %s", fileName));
         try {
             FileWriter writer = new FileWriter(fileName);
             writer.write(HEADER);
@@ -103,7 +102,7 @@ public class MuseEegServer implements EegServer {
             writer.close();
 
         } catch (IOException e) {
-            logger.error("could not write to path: %s", fileName, e);
+            logger.error(String.format("could not write to path: %s", fileName), e);
         }
     }
 

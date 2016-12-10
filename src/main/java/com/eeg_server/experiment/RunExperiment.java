@@ -9,8 +9,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-import static com.eeg_server.experiment.oddball.FileUtils.addTypeToPath;
-
 
 /**
  * @author shiran on 13/08/2016.
@@ -19,17 +17,16 @@ public class RunExperiment {
 
     private static final Logger logger = LogManager.getLogger(RunExperiment.class);
 
-    private static ExperimentType experimentType = ExperimentType.Alpha;
+    private static ExperimentType experimentType = ExperimentType.OddBall;
 
     public static void main(String args[]) throws InterruptedException, IOException {
         System.setProperty("java.awt.headless", "true");
         EegServer server = new MuseEegServer();
         Experiment experiment;
         if (ExperimentType.OddBall.equals(experimentType)) {
-            experiment = new OddBallExperiment(2, 10, 7);
+            experiment = new OddBallExperiment(10,0, 10,6);
         } else {
             experiment = new AlphaWave(10);
-
         }
         server.startRecord();
         experiment.start();
@@ -40,9 +37,8 @@ public class RunExperiment {
         }
         server.stopRecord();
         Thread.sleep(2000);
-        addTypeToPath(experimentType);
         experiment.dumpResults();
-        server.dumpResults();
+        server.dumpResults(experimentType.name());
         server.close();
     }
 }

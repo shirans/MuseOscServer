@@ -1,7 +1,6 @@
 package com.eeg_server.experiment.oddball;
 
 import com.eeg_server.eegServer.EegData;
-import com.eeg_server.experiment.ExperimentType;
 import com.eeg_server.utils.TimeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,7 +13,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 /**
- * @auter Shiran Schwartz on 20/08/2016.
+ * @author Shiran Schwartz on 20/08/2016.
  */
 public class FileUtils {
 
@@ -23,23 +22,19 @@ public class FileUtils {
     public static final String CSV_SEPARSATOR = ",";
     private static SimpleDateFormat FILE_FORMAT_NAME = new SimpleDateFormat("yy-MM-dd_HH-mm");
 
-    private static String currFileName = FILE_FORMAT_NAME.format(new Date());
-
-    private static String eegResultsPath = "/Users/shiran/out/";
-    private static String path;
-    private static Boolean init = false;
-    private static final Object sync = new Object();
+    private static String TIMESTAMP_FOLDER = FILE_FORMAT_NAME.format(new Date());
+    private static String BASE_PATH = "/Users/shiran/out/";
+    private static volatile String path;
 
     private static void init() {
-        if (!init) {
-            synchronized (sync) {
-                if (!init) {
-                    path = eegResultsPath + currFileName;
+        if (path == null) {
+            synchronized (FileUtils.class) {
+                if (path == null) {
+                    path = BASE_PATH + TIMESTAMP_FOLDER;
                     boolean created = new File(path).mkdir();
                     if (!created) {
                         logger.error("could not create a new dir:" + path);
                     }
-                    init = true;
                 }
             }
         }
@@ -49,11 +44,9 @@ public class FileUtils {
         init();
         return path;
     }
-    public static void addTypeToPath(ExperimentType type) {
-        path = path + type.name() + "/";
-    }
 
     public static Path resolve(String eegData) {
+        init();
         return Paths.get(path).resolve(eegData);
     }
 
@@ -63,13 +56,14 @@ public class FileUtils {
         builder.append(CSV_SEPARSATOR);
         builder.append(TimeUtils.format(eegData.getServerTimeTag()));  // server timetag
         builder.append(CSV_SEPARSATOR);
+        builder.append(eegData.getServerTimeTag()); // raw timetag
+        builder.append(CSV_SEPARSATOR);
+        builder.append(eegData.getServerTimeTag());// raw server time
+        builder.append(CSV_SEPARSATOR);
         builder.append(eegData.getType());// type
         builder.append(CSV_SEPARSATOR);
         builder.append(Arrays.toString(eegData.getArguments())); // data
         builder.append(CSV_SEPARSATOR);
-        builder.append(eegData.getServerTimeTag()); // raw timetag
-        builder.append(CSV_SEPARSATOR);
-        builder.append(eegData.getServerTimeTag());// raw server time
         return builder.toString();
     }
 }

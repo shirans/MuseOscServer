@@ -9,7 +9,7 @@ import org.apache.logging.log4j.util.Strings;
 import java.util.Arrays;
 
 /**
- * @auter shiran Schwartz on 01/10/2016.
+ * @author shiran Schwartz on 01/10/2016.
  */
 public class MuseSignals {
     private static final Logger logger = LogManager.getLogger(MuseSignals.class);

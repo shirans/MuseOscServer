@@ -15,10 +15,11 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 /**
- * @auter shiran Schwartz on 26/11/2016.
+ * @author shiran Schwartz on 26/11/2016.
  */
 public class Experiment {
     private static final Logger logger = LogManager.getLogger(Experiment.class);
+    private final int sleepInterval;
     private int sleepFactor;
     private int numIterations;
     private int randomize;
@@ -29,18 +30,20 @@ public class Experiment {
         Experiment.isFinished = isFinished;
     }
 
-    protected Experiment(int sleepFactor, int numIterations, int randomize) {
+    protected Experiment(int sleepInterval, int sleepFactor, int numIterations, int randomize) {
+        this.sleepInterval = sleepInterval;
         this.sleepFactor = sleepFactor;
         this.numIterations = numIterations;
         this.randomize = randomize;
     }
+
     private static Boolean isFinished = false;
 
     protected Queue<Pair<Long, Type>> events;
 
     public void start() {
         logger.info("starting Playing thread");
-        playingThread = new PlayingThread(this.sleepFactor,this.numIterations, this.randomize);
+        playingThread = new PlayingThread(this.sleepInterval, this.sleepFactor, this.numIterations, this.randomize);
         this.events = playingThread.getEvents();
         playingThread.start();
     }
@@ -52,12 +55,14 @@ public class Experiment {
     Boolean isFinished() {
         return isFinished;
     }
+
     void dumpResults() throws IOException {
         String path = FileUtils.getPath();
 
         List<String> lines = playingThread.getEvents().stream().map(x -> x.getLeft() + "," + x.getRight()).collect(Collectors.toList());
         Files.write(Paths.get(path).resolve("oddBallResults.txt"), lines);
     }
+
     int getEventsSize() {
         return events.size();
     }

@@ -1,7 +1,7 @@
 package com.eeg_server.utils;
 
 /**
- * @auter shiran Schwartz on 25/11/2016.
+ * @author shiran Schwartz on 25/11/2016.
  */
 public class TimeUtils {
     public static final SyncDateTimeFormatter FORMAT = new SyncDateTimeFormatter("yyyy-MM-dd HH:mm:ss.SSSSSS Z");
