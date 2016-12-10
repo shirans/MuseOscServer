@@ -1,27 +1,30 @@
 package com.eeg_server.eegServer;
 
-import com.eeg_server.oddball.FileUtil;
-import com.eeg_server.oddball.OddBallExperiment;
+import com.eeg_server.experiment.oddball.FileUtils;
+import com.eeg_server.experiment.oddball.OddBallExperiment;
 import com.eeg_server.oscP5.OscMessage;
 import com.eeg_server.oscP5.OscP5;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
+import static com.eeg_server.experiment.oddball.FileUtils.NEW_LINE;
+
 /**
- * @auter shiran on 20/08/2016.
+ * @author shiran on 20/08/2016.
  */
 public class MuseEegServer implements EegServer {
 
     private static final Logger logger = LogManager.getLogger(OddBallExperiment.class);
+    private static final String HEADER = "Timetag Ntp,Server Timestamp,Raw Timetag, Raw Server Timestamp,Data Type,data";
     private OscP5 oscP5;
-    private List<String> messages = Lists.newLinkedList();
+    private List<EegData> messages = Lists.newLinkedList();
 
 
     public static void main(String args[]) throws InterruptedException {
@@ -34,34 +37,37 @@ public class MuseEegServer implements EegServer {
         logger.info("MuseEegServer starts recording");
     }
 
+
+    public String convertTime(long time) {
+        Date date = new Date(time);
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z");
+        //format.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return format.format(date);
+    }
+
     void oscEvent(OscMessage msg) {
-        long currTime = System.currentTimeMillis();
         Type type = Type.getValue(msg.addrPattern());
-//        logger.info(msg.addrPattern());
+
         String msgToAdd = null;
         switch (type) {
             case OTHER:
                 return;
-            case EEG:
-                msgToAdd = parse(currTime, msg, Type.EEG);
-                break;
             case HORSE_SHOE:
-                logger.info("signal quality:" + parse(currTime,msg, Type.HORSE_SHOE));
-                break;
-            case STRICT:
-                logger.info("is good: " + parse(currTime,msg,Type.STRICT));
+//                logger.info("signal quality:" + MuseSignals.asString(msg, Type.HORSE_SHOE));
+                return;
             case QUANTIZATION_EEG:
                 logger.info("device Quantization:" + MuseSignals.parseQuantization(msg));
-                break;
+                return;
+            case STRICT:
+                logger.info("is good: " + MuseSignals.asString(msg, Type.STRICT));
+                return;
+            case EEG:
+            default:
+                long timetag = msg.timetag();
+                long serverCurrentTimestamp = System.currentTimeMillis();
+                EegData data = new EegData(type.name(), timetag, serverCurrentTimestamp, msg.arguments());
+                messages.add(data);
         }
-
-        if (Strings.isNotEmpty(msgToAdd)) {
-            messages.add(msgToAdd);
-        }
-    }
-
-    private String parse(long currTime, OscMessage msg, Type type) {
-        return MuseSignals.asString(currTime, msg.arguments(),type);
     }
 
     @Override
@@ -81,17 +87,41 @@ public class MuseEegServer implements EegServer {
     }
 
     @Override
-    public void dumpResults() {
-        String path = FileUtil.getPath();
-        logger.info("saving results to path:" + path);
+    public void dumpResults(String filename) {
+        String fileName = FileUtils.resolve(filename + ".csv").toString();
+        logger.info(String.format("writing data to file at path: %s", fileName));
         try {
-            Files.write(Paths.get(path).resolve("EegData"), messages);
+            FileWriter writer = new FileWriter(fileName);
+            writer.write(HEADER);
+            writer.write(NEW_LINE);
+            for (EegData eegData : messages) {
+                writer.append(FileUtils.formatCsvLine(eegData));
+                writer.append(NEW_LINE);
+            }
+            writer.flush();
+            writer.close();
+
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(String.format("could not write to path: %s", fileName), e);
         }
     }
 
 
     // how to process brain waves: https://github.com/shevek/dblx/blob/4734d4617bc042895a28b14d26fc53fd780a9018/dblx-iface-muse/src/main/java/org/anarres/dblx/iface/muse/net/MuseConnect.java
+    /**
+     * // NTP representation
+     String asBitsString = String.format("%032d", new BigInteger(Long.toBinaryString((long) timetag)));
+     String first32 = asBitsString.substring(0,32);
+     long secondsSince1900 = new BigInteger(first32, 2).longValue();
+     String last32 = asBitsString.substring(33);
+     long microsecondsSince1900 = new BigInteger(first32, 2).longValue();
+     long ntp = secondsSince1900 + microsecondsSince1900;
+     //(70*365 + 17)*86400 = 2208988800
+     long unitNtpDelta = (long) (70 * 365 + 17) * 86400;
+     long secondsAsMs = secondsSince1900*1000;
+     long microSecondsAsMs = microsecondsSince1900/1000;
+     long NtpMs =secondsAsMs + microSecondsAsMs;
+     long s = secondsAsMs
+     */
 
 }

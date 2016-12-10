@@ -25,10 +25,11 @@
 
 package com.eeg_server.oscP5;
 
-import java.net.InetAddress;
-import java.util.ArrayList;
 import com.eeg_server.netP5.Bytes;
 import com.eeg_server.netP5.TcpClient;
+
+import java.net.InetAddress;
+import java.util.ArrayList;
 
 /**
  *
@@ -67,7 +68,6 @@ protected static final byte ZEROBYTE = 0x00;
 
   protected OscPatcher() {
   }
-
 
   protected int parseBundle(final byte[] theBytes,
                             final InetAddress theAddress, final int thePort,

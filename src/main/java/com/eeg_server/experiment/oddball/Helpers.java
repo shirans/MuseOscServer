@@ -1,4 +1,4 @@
-package com.eeg_server.oddball;
+package com.eeg_server.experiment.oddball;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import javax.sound.sampled.Clip;
 
 /**
- * @auter Shiran Schwartz on 20/08/2016.
+ * @author Shiran Schwartz on 20/08/2016.
  */
 class Helpers {
 
@@ -17,6 +17,7 @@ class Helpers {
             clip.setFramePosition(0);
             clip.addLineListener(listener);
             clip.start();
+//            clip.drain();
         } catch (Exception e) {
             e.printStackTrace();
         }

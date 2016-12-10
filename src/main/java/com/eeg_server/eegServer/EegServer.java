@@ -1,7 +1,7 @@
 package com.eeg_server.eegServer;
 
 /**
- * @auter shiran on 20/08/2016.
+ * @Author shiran on 20/08/2016.
  */
 public interface EegServer {
 
@@ -13,5 +13,5 @@ public interface EegServer {
 
     int getEventsSize();
 
-    void dumpResults();
+    void dumpResults(String fileName);
 }
