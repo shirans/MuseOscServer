@@ -13,3 +13,9 @@ hs_err_pid*
 
 #idea
 .idea/*
+
+
+.classpath
+.project
+.settings/
+/target/**
