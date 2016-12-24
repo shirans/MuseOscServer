@@ -9,7 +9,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 
 /**
@@ -62,8 +61,10 @@ public class FileUtils {
         builder.append(CSV_SEPARSATOR);
         builder.append(eegData.getType());// type
         builder.append(CSV_SEPARSATOR);
-        builder.append(Arrays.toString(eegData.getArguments())); // data
-        builder.append(CSV_SEPARSATOR);
+        for (Object str: eegData.getArguments()) {
+            builder.append(str); // data
+            builder.append(CSV_SEPARSATOR);
+        }
         return builder.toString();
     }
 }
