@@ -1,12 +1,13 @@
 package com.eeg_server.utils;
 
+import org.apache.commons.net.ntp.TimeStamp;
+
 /**
  * @author shiran Schwartz on 25/11/2016.
  */
 public class TimeUtils {
-    public static final SyncDateTimeFormatter FORMAT = new SyncDateTimeFormatter("yyyy-MM-dd HH:mm:ss.SSSSSS Z");
+    public static final SyncDateTimeFormatter FORMAT = new SyncDateTimeFormatter("yyyy-MM-dd HH:mm:ss.SSSSSS");
     public static final long SEVENTY_YEARS_INSECONDS = (70 * 365 + 17) * 86400L;
-
 
     /***
      * http://forum.choosemuse.com/t/stream-raw-data-from-muse2016-to-mac/944/8
@@ -66,8 +67,8 @@ public class TimeUtils {
         return new org.apache.commons.net.ntp.TimeStamp(timetag).getTime();
     }
 
-    public static String getNTPtimeString(long timetag) {
-        return new org.apache.commons.net.ntp.TimeStamp(timetag).toDateString();
+    public static String getNtpTimeString(long timetag) {
+        return FORMAT.format(new TimeStamp(timetag).getDate());
     }
 }
 

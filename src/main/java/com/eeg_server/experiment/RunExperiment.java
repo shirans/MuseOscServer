@@ -24,7 +24,7 @@ public class RunExperiment {
         EegServer server = new MuseEegServer();
         Experiment experiment;
         if (ExperimentType.OddBall.equals(experimentType)) {
-            experiment = new OddBallExperiment(10,0, 10,6);
+            experiment = new OddBallExperiment(7,0, 1,6);
         } else {
             experiment = new AlphaWave(10);
         }
@@ -38,7 +38,7 @@ public class RunExperiment {
         server.stopRecord();
         Thread.sleep(2000);
         experiment.dumpResults();
-        server.dumpResults(experimentType.name());
+        server.dumpResults(experimentType.name().toLowerCase());
         server.close();
     }
 }

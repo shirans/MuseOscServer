@@ -33,10 +33,6 @@ public class PlayingThread extends Thread {
     private Random randomGenerator = new Random();
     private long sleepInterval;
 
-    public EventListener getLineListener() {
-        return lineListener;
-    }
-
     private EventListener lineListener = new EventListener();
 
     public PlayingThread(long sleepInterval, int sleepFactor, int numIterations, int randomize) {

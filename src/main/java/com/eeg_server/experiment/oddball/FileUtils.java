@@ -15,7 +15,6 @@ import java.util.Date;
  * @author Shiran Schwartz on 20/08/2016.
  */
 public class FileUtils {
-
     private static final Logger logger = LogManager.getLogger(FileUtils.class);
     public static final String NEW_LINE = "\n";
     public static final String CSV_SEPARSATOR = ",";
@@ -51,7 +50,7 @@ public class FileUtils {
 
     public static String formatCsvLine(EegData eegData) {
         StringBuilder builder = new StringBuilder();
-        builder.append(TimeUtils.convertOscTimeTagBySpecString(eegData.getTimeTagNtp())); // real timetag
+        builder.append(TimeUtils.getNtpTimeString(eegData.getTimeTagNtp())); // real timetag
         builder.append(CSV_SEPARSATOR);
         builder.append(TimeUtils.format(eegData.getServerTimeTag()));  // server timetag
         builder.append(CSV_SEPARSATOR);
