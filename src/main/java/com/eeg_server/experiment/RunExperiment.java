@@ -17,7 +17,7 @@ public class RunExperiment {
 
     private static final Logger logger = LogManager.getLogger(RunExperiment.class);
 
-    private static ExperimentType experimentType = ExperimentType.OddBall;
+    public static ExperimentType experimentType = ExperimentType.Alpha;
 
     public static void main(String args[]) throws InterruptedException, IOException {
         System.setProperty("java.awt.headless", "true");
@@ -26,7 +26,7 @@ public class RunExperiment {
         if (ExperimentType.OddBall.equals(experimentType)) {
             experiment = new OddBallExperiment(7,0, 1,6);
         } else {
-            experiment = new AlphaWave(10);
+            experiment = new AlphaWave(5);
         }
         server.startRecord();
         experiment.start();
@@ -37,7 +37,7 @@ public class RunExperiment {
         }
         server.stopRecord();
         Thread.sleep(2000);
-        experiment.dumpResults();
+        experiment.dumpResults(experimentType.name().toLowerCase());
         server.dumpResults(experimentType.name().toLowerCase());
         server.close();
     }

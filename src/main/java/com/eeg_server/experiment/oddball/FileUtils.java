@@ -1,6 +1,7 @@
 package com.eeg_server.experiment.oddball;
 
 import com.eeg_server.eegServer.EegData;
+import com.eeg_server.experiment.RunExperiment;
 import com.eeg_server.utils.TimeUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +29,7 @@ public class FileUtils {
         if (path == null) {
             synchronized (FileUtils.class) {
                 if (path == null) {
-                    path = BASE_PATH + TIMESTAMP_FOLDER;
+                    path = BASE_PATH + TIMESTAMP_FOLDER + "_" + RunExperiment.experimentType.name();
                     boolean created = new File(path).mkdir();
                     if (!created) {
                         logger.error("could not create a new dir:" + path);

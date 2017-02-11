@@ -1,32 +1,43 @@
+import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import csv
+from os import listdir
+from os.path import isfile
+import os
+
+import time
+
+from utils.log import get_logger
+
+logger = get_logger('InputParser')
 
 
 class InputParser:
-    def __init__(self, file_path):
-        self.file_path = file_path
-        self.num_rows = self.num_rows(self.file_path)
-        self.parse_file()
-        self.eeg_data
+    def __init__(self, folderPath):
+
+        self.folderPath = folderPath
+        for f in listdir(folderPath):
+            if isfile:
+                filename, file_extension = os.path.splitext(f)
+                if file_extension == '.txt':
+                    self.experimentQues = os.path.join(folderPath, f)
+                elif file_extension == '.csv':
+                    self.experimentData = os.path.join(folderPath, f)
+        self.num_rows = self.num_rows(self.experimentData)
+        logger.info("num rows: " + str(self.num_rows))
+        logger.info("starting to parse experiment data from:" + self.experimentData)
+        with open(self.experimentData, 'rU') as csvfile:
+            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter)
+            columns = ['Timetag Ntp', 'Server Timestamp', 'Raw Timetag', ' Raw Server Timestamp', 'Data Type', 'data']
+            self.eeg_data = self.appedEegOneByOne(reader)
+        logger.info("created data: " + str(self.eeg_data))
 
     @staticmethod
     def num_rows(file_path):
         with open(file_path, 'rU') as csvfile:
             # reader = csv.reader(csvfile, delimiter=csv.excel.delimiter)
             return sum(1 for row in csvfile)
-
-    def parse_file(self):
-        with open(self.file_path, 'rU') as csvfile:
-            reader = csv.reader(csvfile, delimiter=csv.excel.delimiter)
-            columns = ['Timetag Ntp', 'Server Timestamp', 'Raw Timetag', ' Raw Server Timestamp', 'Data Type', 'data']
-
-            eeg_0 = []
-            eeg_1 = []
-            eeg_2 = []
-            eeg_3 = []
-            xs_time = []
-            self.eeg_data = self.appedEEGOneByOne(eeg_0, eeg_1, eeg_2, eeg_3, xs_time, reader)
             # xs = np.asarray([x[14:23] for x in xs_time[:3]])
             # ys = np.asarray(eeg_0[:100])
             # xs1 = np.arange(100)
@@ -34,47 +45,54 @@ class InputParser:
             # plt.plot(xs1, ys)
             # plt.show()
 
-    def appedEEGOneByOne(self, eeg_0, eeg_1, eeg_2, eeg_3, xs_time, reader):
+    def appedEegOneByOne(self, reader):
         it = iter(reader)
         next(it)
-        xs_time = []
-        eeg = np.empty((self.num_rows, 4))
-        alpha = []
-        beta = []
-        gamma = []
-        delta = []
-        theta = []
+        # eeg = np.empty((self.num_rows, 4))
+        rows = self.num_rows
+        cols = 4
+        # eeg = np.empty((rows, cols))
+        eeg = [(None, [0 for x in range(cols)]) for y in range(rows)]
+        eegInd = 0
+        wave_data = {'ALPHA': [], 'BETA': [], 'DELTA': [], 'THETA': [], 'GAMMA': []}
+
         for ind, row in enumerate(it):
             # ntp = datetime.strptime(row[0][:26], '%Y-%m-%d %H:%M:%S.%f')
             # server = datetime.strptime(row[1][:26], '%Y-%m-%d %H:%M:%S.%f')
             # timerow = np.array(ntp,server,dtype=time)
-            xs_time.append(row[0])
-            if row[4] == 'EEG':
-                eeg[:ind, :] = row[5:9]
-            elif row[4] == 'ALPHA':
-                alpha.append(row[5])
-            elif row[4] == 'BETA':
-                beta.append(row[5])
-            elif row[4] == 'DELTA':
-                delta.append(row[5])
-            elif row[4] == 'THETA':
-                theta.append(row[5])
-            elif row[4] == 'GAMMA':
-                gamma.append(row[5])
-        return EegData(xs_time, alpha, beta, gamma, delta, theta)
+            start_time = datetime.datetime.now()
+
+            time = timeObject(row)
+            data_type = row[4]
+
+            if data_type == 'EEG':
+                eeg[eegInd] = [time, row[5:9]]
+                eegInd += 1
+            else:
+                wave = row[4]
+                wave_data[data_type].append((time, wave))
+        return EegData(eeg, wave_data)
 
     def __str__(self):
-        return 'num_rows:' + str(self.num_rows) + ", file:" + len(self.file_path) + ", eeg data: " + self.eeg_data
+        return 'num_rows:' + str(self.num_rows) + ", file:" + len(self.experimentData) + ", eeg data: " + self.eeg_data
+
+
+class timeObject:
+    def __init__(self, row):
+        self.timetag_ntp = row[0]
+        self.server_timestamp = row[1]
+        self.raw_ntp_timetag = row[2]
+        self.raw_server_timetap = row[3]
 
 
 class EegData:
-    def __init__(self, xs_time, alpha, beta, gamma, delta, theta):
-        self.xs_time = xs_time
-        self.alpha = alpha
-        self.beta = beta
-        self.gamma = gamma
-        self.delta = delta
-        self.theta = theta
+    def __init__(self, raw_eeg, wave_data):
+        self.wave_data = wave_data
+        self.raw_eeg = raw_eeg
 
     def __str__(self):
-        return 'x:' + str(len(self.xs_time)) + ", alpha:" + str(len(self.alpha))
+        to_string = []
+        for index, wave_type in enumerate(self.wave_data):
+            to_string.append(wave_type + ": " + str(len(self.wave_data[wave_type])) + ",")
+        to_string.append("eeg data:" + str(len(self.raw_eeg)))
+        return ''.join(to_string)

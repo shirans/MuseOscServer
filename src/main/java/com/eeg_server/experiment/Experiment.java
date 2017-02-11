@@ -56,11 +56,11 @@ public class Experiment {
         return isFinished;
     }
 
-    void dumpResults() throws IOException {
+    void dumpResults(String fileName) throws IOException {
         String path = FileUtils.getPath();
 
         List<String> lines = playingThread.getEvents().stream().map(x -> x.getLeft() + "," + x.getRight()).collect(Collectors.toList());
-        Files.write(Paths.get(path).resolve("oddBallResults.txt"), lines);
+        Files.write(Paths.get(path).resolve(fileName + ".txt"), lines);
     }
 
     int getEventsSize() {
