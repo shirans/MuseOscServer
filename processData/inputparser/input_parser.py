@@ -14,16 +14,19 @@ logger = get_logger('InputParser')
 
 
 class InputParser:
-    def __init__(self, folderPath):
-
-        self.folderPath = folderPath
-        for f in listdir(folderPath):
+    def __init__(self, folder_path):
+        self.folderPath = folder_path
+        for f in listdir(folder_path):
             if isfile:
                 filename, file_extension = os.path.splitext(f)
                 if file_extension == '.txt':
-                    self.experimentQues = os.path.join(folderPath, f)
+                    self.experimentQues = os.path.join(folder_path, f)
                 elif file_extension == '.csv':
-                    self.experimentData = os.path.join(folderPath, f)
+                    self.experimentData = os.path.join(folder_path, f)
+        expType = os.path.basename(folder_path).split('_')
+        self.date = expType[0]
+        self.time = expType[1]
+        self.type = expType[2]
         self.num_rows = self.num_rows(self.experimentData)
         logger.info("num rows: " + str(self.num_rows))
         logger.info("starting to parse experiment data from:" + self.experimentData)
