@@ -13,6 +13,14 @@ from utils.log import get_logger
 logger = get_logger('InputParser')
 
 
+def extract_cues(reader):
+    it = iter(reader)
+    cues = []
+    for row in it:
+        cues.append((row[0],row[1]))
+    return cues
+
+
 class InputParser:
     def __init__(self, folder_path):
         self.folderPath = folder_path
@@ -20,20 +28,24 @@ class InputParser:
             if isfile:
                 filename, file_extension = os.path.splitext(f)
                 if file_extension == '.txt':
-                    self.experimentQues = os.path.join(folder_path, f)
+                    self.experiment_cues = os.path.join(folder_path, f)
                 elif file_extension == '.csv':
-                    self.experimentData = os.path.join(folder_path, f)
+                    self.experiment_data = os.path.join(folder_path, f)
         expType = os.path.basename(folder_path).split('_')
         self.date = expType[0]
         self.time = expType[1]
         self.type = expType[2]
-        self.num_rows = self.num_rows(self.experimentData)
+        self.num_rows = self.num_rows(self.experiment_data)
         logger.info("num rows: " + str(self.num_rows))
-        logger.info("starting to parse experiment data from:" + self.experimentData)
-        with open(self.experimentData, 'rU') as csvfile:
+        logger.info("starting to parse experiment data from:" + self.experiment_data)
+        with open(self.experiment_data, 'rU') as csvfile:
             reader = csv.reader(csvfile, delimiter=csv.excel.delimiter)
             columns = ['Timetag Ntp', 'Server Timestamp', 'Raw Timetag', ' Raw Server Timestamp', 'Data Type', 'data']
             self.eeg_data = self.appedEegOneByOne(reader)
+        with open(self.experiment_cues) as csv_file:
+            reader = csv.reader(csv_file, delimiter=csv.excel.delimiter)
+            self.cues = extract_cues(reader)
+
         logger.info("created data: " + str(self.eeg_data))
 
     @staticmethod
@@ -72,12 +84,12 @@ class InputParser:
                 eeg[eegInd] = [time, row[5:9]]
                 eegInd += 1
             else:
-                wave = row[4]
+                wave = row[5]
                 wave_data[data_type].append((time, wave))
         return EegData(eeg, wave_data)
 
     def __str__(self):
-        return 'num_rows:' + str(self.num_rows) + ", file:" + len(self.experimentData) + ", eeg data: " + self.eeg_data
+        return 'num_rows:' + str(self.num_rows) + ", file:" + len(self.experiment_data) + ", eeg data: " + self.eeg_data
 
 
 class timeObject:
