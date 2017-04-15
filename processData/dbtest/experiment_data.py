@@ -69,7 +69,7 @@ def insert_by_wave_type(conn, eeg_data, wave_type, ex_id):
             c.execute(INSERT_STM, (ex_id, server_timestamp, device_timestamp,wave_type, value,))
         except Exception as e:
             logger.error(
-                'failed to parse line:' + str(line) + " at index:" + str(index) + " with message:" + e.message)
+                'failed to insert line:' + str(line) + " at index:" + str(index) + " with message:" + e.message)
             err_count += 1
             continue
 
@@ -79,7 +79,7 @@ def insert_cues(conn, cues, ex_id):
     INSERT_STM = '''INSERT INTO {} ({},{},{}) values (?,?,?)'''.format(
         CUES_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, CUE_NAME_COL)
     for cue in cues:
-        c.execute(INSERT_STM, (ex_id, cue[0], cue[1]))
+        c.execute(INSERT_STM, (ex_id, datetime.datetime.utcfromtimestamp(long(cue[0])/1000.0), cue[1]))
     conn.commit()
 
 
@@ -117,9 +117,8 @@ class ExperimentData:
             TYPE_COL, VALUE_COL)
 
         cues_table = '''CREATE TABLE IF NOT EXISTS {}
-            ({} integer primary key, {} integer, {} timestamp, {} timestamp, {} string)'''.format(
-            CUES_TABLE, ID_COL, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, CUE_NAME_COL,
-            VALUE_COL)
+            ({} integer primary key, {} integer, {} timestamp, {} string)'''.format(
+            CUES_TABLE, ID_COL, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, CUE_NAME_COL)
 
         logger.info("create table:" + meta_data_table)
         logger.info("create table:" + raw_eeg_table)

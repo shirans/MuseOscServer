@@ -47,6 +47,7 @@ class InputParser:
             self.cues = extract_cues(reader)
 
         logger.info("created data: " + str(self.eeg_data))
+        logger.info("created data: " + str(self.eeg_data))
 
     @staticmethod
     def num_rows(file_path):
@@ -86,7 +87,7 @@ class InputParser:
             else:
                 wave = row[5]
                 wave_data[data_type].append((time, wave))
-        return EegData(eeg, wave_data)
+        return EegData(eeg[:eegInd], wave_data)
 
     def __str__(self):
         return 'num_rows:' + str(self.num_rows) + ", file:" + len(self.experiment_data) + ", eeg data: " + self.eeg_data
