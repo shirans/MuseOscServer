@@ -1,12 +1,8 @@
-import datetime
-import matplotlib.pyplot as plt
-import numpy as np
+import ntplib
 import csv
 from os import listdir
 from os.path import isfile
 import os
-
-import time
 
 from utils.log import get_logger
 
@@ -17,7 +13,7 @@ def extract_cues(reader):
     it = iter(reader)
     cues = []
     for row in it:
-        cues.append((row[0],row[1]))
+        cues.append((row[0], row[1]))
     return cues
 
 
@@ -64,10 +60,8 @@ class InputParser:
     def appedEegOneByOne(self, reader):
         it = iter(reader)
         next(it)
-        # eeg = np.empty((self.num_rows, 4))
         rows = self.num_rows
         cols = 4
-        # eeg = np.empty((rows, cols))
         eeg = [(None, [0 for x in range(cols)]) for y in range(rows)]
         eegInd = 0
         wave_data = {'ALPHA': [], 'BETA': [], 'DELTA': [], 'THETA': [], 'GAMMA': []}
@@ -76,7 +70,6 @@ class InputParser:
             # ntp = datetime.strptime(row[0][:26], '%Y-%m-%d %H:%M:%S.%f')
             # server = datetime.strptime(row[1][:26], '%Y-%m-%d %H:%M:%S.%f')
             # timerow = np.array(ntp,server,dtype=time)
-            start_time = datetime.datetime.now()
 
             time = timeObject(row)
             data_type = row[4]
@@ -87,6 +80,7 @@ class InputParser:
             else:
                 wave = row[5]
                 wave_data[data_type].append((time, wave))
+
         return EegData(eeg[:eegInd], wave_data)
 
     def __str__(self):
@@ -97,8 +91,8 @@ class timeObject:
     def __init__(self, row):
         self.timetag_ntp = row[0]
         self.server_timestamp = row[1]
-        self.raw_ntp_timetag = row[2]
-        self.raw_server_timetap = row[3]
+        self.raw_ntp_timestamp = row[2]
+        self.raw_server_timestamp = row[3]
 
 
 class EegData:

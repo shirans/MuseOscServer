@@ -1,7 +1,8 @@
 import sqlite3
 
 from utils.log import get_logger
-import datetime, time
+from datetime import datetime
+import time
 
 logger = get_logger('ExperimentData')
 META_DATA_TABLE = 'experiment_meta_data'
@@ -60,13 +61,15 @@ def insert_by_wave_type(conn, eeg_data, wave_type, ex_id):
     c = conn.cursor()
     err_count = 0
     INSERT_STM = '''INSERT INTO {} ({},{},{},{},{}) values (?,?,?,?,?)'''.format(
-        WAVE_EEG_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL,TYPE_COL, VALUE_COL)
+        WAVE_EEG_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL, TYPE_COL, VALUE_COL)
     for index, line in enumerate(eeg_data.wave_data[wave_type]):
         try:
             server_timestamp = line[0].server_timestamp
             device_timestamp = line[0].timetag_ntp
+            device_raw = datetime.utcfromtimestamp(float(line[0].raw_ntp_timestamp)/1000)
+            server_raw = datetime.utcfromtimestamp(float(line[0].raw_server_timestamp)/1000)
             value = line[1]
-            c.execute(INSERT_STM, (ex_id, server_timestamp, device_timestamp,wave_type, value,))
+            c.execute(INSERT_STM, (ex_id, server_raw, device_raw, wave_type, value,))
         except Exception as e:
             logger.error(
                 'failed to insert line:' + str(line) + " at index:" + str(index) + " with message:" + e.message)
@@ -79,7 +82,7 @@ def insert_cues(conn, cues, ex_id):
     INSERT_STM = '''INSERT INTO {} ({},{},{}) values (?,?,?)'''.format(
         CUES_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, CUE_NAME_COL)
     for cue in cues:
-        c.execute(INSERT_STM, (ex_id, datetime.datetime.utcfromtimestamp(long(cue[0])/1000.0), cue[1]))
+        c.execute(INSERT_STM, (ex_id, datetime.utcfromtimestamp(long(cue[0]) / 1000.0), cue[1]))
     conn.commit()
 
 
@@ -136,14 +139,7 @@ class ExperimentData:
     def insert(self, input_parser):
         conn = get_connection()
         c = conn.cursor()
-        ex_type = input_parser.type
-        date = "20" + input_parser.date + " " + input_parser.time.replace('-', ':') + ":00"
-
-        c.execute(INSERT_METADATA, (ex_type, date))
-        conn.commit()
-
-        ex_id = c.execute("select * from experiment_meta_data where date =? and type = ? order by id desc",
-                          (date, ex_type,)).fetchone()[0]
+        ex_id = createNewExperiment(c, conn, input_parser)
 
         insert_raw_data(conn, ex_id, input_parser.eeg_data.raw_eeg)
 
@@ -153,9 +149,17 @@ class ExperimentData:
 
         insert_cues(conn, input_parser.cues, ex_id)
         conn.close()
+        return ex_id
 
-    def test(self):
-        conn = get_connection()
-        c = conn.cursor()
-        for row in c.execute("select * from " + RAW_EEG_TABLE):
-            print row
+
+def createNewExperiment(c, conn, input_parser):
+    experiment_type = input_parser.type
+    date = "20" + input_parser.date + " " + input_parser.time.replace('-', ':') + ":00"
+    logger.info("creating new experiment id with time " + str(date))
+    c.execute(INSERT_METADATA, (experiment_type, date))
+    conn.commit()
+    ex_id = c.execute("select * from experiment_meta_data where date =? and type = ? order by id desc",
+                      (date, experiment_type,)).fetchone()[0]
+
+    logger.info("got exeprimed id:" + str(ex_id))
+    return ex_id
