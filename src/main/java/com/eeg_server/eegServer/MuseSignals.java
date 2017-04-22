@@ -63,10 +63,6 @@ public class MuseSignals {
         }
     }
 
-    public static void calcQuality(OscMessage msg) {
-
-    }
-
     public static String asString(OscMessage msg, Type t) {
         return String.format("%s,%s,%s", TimeUtils.getNtpTimeString(msg.timetag()),t.name(),asString(msg.arguments()));
     }

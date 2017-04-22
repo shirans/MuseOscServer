@@ -5,6 +5,7 @@ import com.eeg_server.experiment.oddball.OddBallExperiment;
 import com.eeg_server.oscP5.OscMessage;
 import com.eeg_server.oscP5.OscP5;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,9 +14,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import static com.eeg_server.experiment.oddball.FileUtils.NEW_LINE;
 
+//TODO: parse 	/muse/eeg/quantization,
 /**
  * @author shiran on 20/08/2016.
  */
@@ -45,22 +48,30 @@ public class MuseEegServer implements EegServer {
         return format.format(date);
     }
 
+    Set<String> others = Sets.newHashSet();
     void oscEvent(OscMessage msg) {
-        Type type = Type.getValue(msg.addrPattern());
+        String name = msg.addrPattern();
+        Type type = Type.getValue(name);
 
         String msgToAdd = null;
         switch (type) {
             case OTHER:
+                String str = msg.addrPattern();
+                if (others.contains(str)) {
+                    return;
+                }
+                logger.debug("got event of type:" + str);
+                others.add(str);
+
                 return;
             case HORSE_SHOE:
 //                logger.info("signal quality:" + MuseSignals.asString(msg, Type.HORSE_SHOE));
                 return;
-            case QUANTIZATION_EEG:
-                logger.info("device Quantization:" + MuseSignals.parseQuantization(msg));
-                return;
             case STRICT:
                 logger.info("is good: " + MuseSignals.asString(msg, Type.STRICT));
                 return;
+            case QUANTIZATION_EEG:
+                logger.info("device Quantization:" + MuseSignals.parseQuantization(msg));
             case EEG:
             default:
                 long timetag = msg.timetag();
