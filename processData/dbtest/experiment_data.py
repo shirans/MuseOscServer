@@ -16,14 +16,13 @@ EEG_TYPE_COL = 'eeg_type'
 SERVER_TIMESTAMP_COL = 'server_timestamp'
 DEVICE_TIMESTAMP_COL = 'device_timestamp'
 TRIAL_ID_COL = 'trial_id'
-ELECTRODE_1_COL = 'e_1'
-ELECTRODE_2_COL = 'e_2'
-ELECTRODE_3_COL = 'e_3'
-ELECTRODE_4_COL = 'e_4'
+TP9 = 'tp9'
+AF7 = 'af7'
+AF8 = 'af8'
+TP10 = 'tp10'
+AUXR = 'auxr'
 
 WAVE_EEG_TABLE = 'eeg_waves'
-VALUE_COL = 'eeg_waves'
-
 CUES_TABLE = 'cues_tables'
 CUE_NAME_COL = 'cue_name'
 
@@ -33,9 +32,9 @@ def adapt_datetime(ts):
 
 
 def insert_raw_data(conn, ex_id, raw_eeg):
-    INSERT_STM = '''INSERT INTO {} ({},{},{},{},{},{},{}) values (?,?,?,?,?,?,?)'''.format(
+    INSERT_STM = '''INSERT INTO {} ({},{},{},{},{},{},{},{}) values (?,?,?,?,?,?,?,?)'''.format(
         RAW_EEG_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL,
-        ELECTRODE_1_COL, ELECTRODE_2_COL, ELECTRODE_3_COL, ELECTRODE_4_COL)
+        TP9, AF7, AF8, TP10, AUXR)
 
     c = conn.cursor()
     err_count = 0
@@ -47,7 +46,8 @@ def insert_raw_data(conn, ex_id, raw_eeg):
             e2 = line[1][1]
             e3 = line[1][2]
             e4 = line[1][3]
-            c.execute(INSERT_STM, (ex_id, server_timestamp, device_timestamp, e1, e2, e3, e4,))
+            e5 = line[1][4]
+            c.execute(INSERT_STM, (ex_id, server_timestamp, device_timestamp, e1, e2, e3, e4, e5))
         except Exception as e:
             logger.error(
                 'failed to parse line:' + str(line) + " at index:" + str(index) + " with message:" + e.message)
@@ -60,16 +60,20 @@ def insert_raw_data(conn, ex_id, raw_eeg):
 def insert_by_wave_type(conn, eeg_data, wave_type, ex_id):
     c = conn.cursor()
     err_count = 0
-    INSERT_STM = '''INSERT INTO {} ({},{},{},{},{}) values (?,?,?,?,?)'''.format(
-        WAVE_EEG_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL, TYPE_COL, VALUE_COL)
+    INSERT_STM = '''INSERT INTO {} ({},{},{},{},{},{},{},{}) values (?,?,?,?,?,?,?,?)'''.format(
+        WAVE_EEG_TABLE, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL, TYPE_COL,
+        TP9, AF7, AF8, TP10)
     for index, line in enumerate(eeg_data.wave_data[wave_type]):
         try:
             server_timestamp = line[0].server_timestamp
             device_timestamp = line[0].timetag_ntp
-            device_raw = datetime.utcfromtimestamp(float(line[0].raw_ntp_timestamp)/1000)
-            server_raw = datetime.utcfromtimestamp(float(line[0].raw_server_timestamp)/1000)
-            value = line[1]
-            c.execute(INSERT_STM, (ex_id, server_raw, device_raw, wave_type, value,))
+            device_raw = datetime.utcfromtimestamp(float(line[0].raw_ntp_timestamp) / 1000)
+            server_raw = datetime.utcfromtimestamp(float(line[0].raw_server_timestamp) / 1000)
+            e1 = line[1][0]
+            e2 = line[1][1]
+            e3 = line[1][2]
+            e4 = line[1][3]
+            c.execute(INSERT_STM, (ex_id, server_raw, device_raw, wave_type, e1, e2, e3, e4))
         except Exception as e:
             logger.error(
                 'failed to insert line:' + str(line) + " at index:" + str(index) + " with message:" + e.message)
@@ -110,14 +114,15 @@ class ExperimentData:
 
         raw_eeg_table = '''CREATE TABLE IF NOT EXISTS {}
             ({} integer primary key, {} integer, {} timestamp, {} timestamp,
-             {} double, {} double, {} double, {} double)'''.format(
+             {} double, {} double, {} double, {} double, {} double)'''.format(
             RAW_EEG_TABLE, ID_COL, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL,
-            ELECTRODE_1_COL, ELECTRODE_2_COL, ELECTRODE_3_COL, ELECTRODE_4_COL)
+            TP9, AF7, AF8, TP10,AUXR)
 
         wave_table = '''CREATE TABLE IF NOT EXISTS {}
-            ({} integer primary key, {} integer, {} timestamp, {} timestamp, {} string,  {} double)'''.format(
-            WAVE_EEG_TABLE, ID_COL, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL,
-            TYPE_COL, VALUE_COL)
+            ({} integer primary key, {} integer, {} timestamp, {} timestamp, {} string,
+            {} double, {} double, {} double, {} double)'''.format(
+            WAVE_EEG_TABLE, ID_COL, TRIAL_ID_COL, SERVER_TIMESTAMP_COL, DEVICE_TIMESTAMP_COL, TYPE_COL,
+            TP9, AF7, AF8, TP10)
 
         cues_table = '''CREATE TABLE IF NOT EXISTS {}
             ({} integer primary key, {} integer, {} timestamp, {} string)'''.format(

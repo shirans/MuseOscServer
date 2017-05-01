@@ -8,6 +8,6 @@ import com.eeg_server.experiment.Experiment;
 public class AlphaWave extends Experiment {
 
     public AlphaWave(int numIterations) {
-        super(10,0, numIterations,0);
+        super(20, 0, numIterations, 0);
     }
 }

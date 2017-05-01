@@ -26,7 +26,7 @@ public class RunExperiment {
         if (ExperimentType.OddBall.equals(experimentType)) {
             experiment = new OddBallExperiment(7,0, 1,6);
         } else {
-            experiment = new AlphaWave(5);
+            experiment = new AlphaWave(10);
         }
         server.startRecord();
         experiment.start();

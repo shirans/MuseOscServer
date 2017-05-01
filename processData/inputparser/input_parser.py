@@ -1,3 +1,5 @@
+from aetypes import Enum
+
 import ntplib
 import csv
 from os import listdir
@@ -5,6 +7,23 @@ from os.path import isfile
 import os
 
 from utils.log import get_logger
+
+EEG = 'EEG'
+ALPHA_ABSOLUTE = 'ALPHA_ABSOLUTE'
+BETA_ABSOLUTE = 'BETA_ABSOLUTE'
+GAMMA_ABSOLUTE = 'GAMMA_ABSOLUTE'
+DELTA_ABSOLUTE = 'DELTA_ABSOLUTE'
+THETA_ABSOLUTE = 'THETA_ABSOLUTE'
+
+
+class DataType(Enum):
+    EEG = 0
+    ALPHA_ABSOLUTE = 1
+    BETA_ABSOLUT = 2
+    GAMMA_ABSOLUTE = 3
+    DELTA_ABSOLUTE = 4
+    THETA_ABSOLUTE = 5
+
 
 logger = get_logger('InputParser')
 
@@ -63,8 +82,13 @@ class InputParser:
         rows = self.num_rows
         cols = 4
         eeg = [(None, [0 for x in range(cols)]) for y in range(rows)]
-        eegInd = 0
-        wave_data = {'ALPHA': [], 'BETA': [], 'DELTA': [], 'THETA': [], 'GAMMA': []}
+        dataIndex = {ALPHA_ABSOLUTE: 0, BETA_ABSOLUTE: 0, DELTA_ABSOLUTE: 0, THETA_ABSOLUTE: 0, GAMMA_ABSOLUTE: 0,
+                     EEG: 0}
+        wave_data = {ALPHA_ABSOLUTE: [(None, [0 for x in range(cols)]) for y in range(rows)],
+                     BETA_ABSOLUTE: [(None, [0 for x in range(cols)]) for y in range(rows)],
+                     DELTA_ABSOLUTE: [(None, [0 for x in range(cols)]) for y in range(rows)],
+                     THETA_ABSOLUTE: [(None, [0 for x in range(cols)]) for y in range(rows)],
+                     GAMMA_ABSOLUTE: [(None, [0 for x in range(cols)]) for y in range(rows)]}
 
         for ind, row in enumerate(it):
             # ntp = datetime.strptime(row[0][:26], '%Y-%m-%d %H:%M:%S.%f')
@@ -74,14 +98,17 @@ class InputParser:
             time = timeObject(row)
             data_type = row[4]
 
-            if data_type == 'EEG':
-                eeg[eegInd] = [time, row[5:9]]
-                eegInd += 1
+            index = dataIndex[data_type]
+            if data_type == EEG:
+                eeg[index] = [time, row[5:10]]
             else:
-                wave = row[5]
-                wave_data[data_type].append((time, wave))
+                wave_data[data_type][index] = [time, row[5:9]]
+            dataIndex[data_type] += 1
+        shorten_wave_data = {}
+        for key, data in wave_data.iteritems():
+            shorten_wave_data[key] = data[:dataIndex[key]]
 
-        return EegData(eeg[:eegInd], wave_data)
+        return EegData(eeg[:dataIndex[EEG]], shorten_wave_data)
 
     def __str__(self):
         return 'num_rows:' + str(self.num_rows) + ", file:" + len(self.experiment_data) + ", eeg data: " + self.eeg_data
