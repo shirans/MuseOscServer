@@ -17,11 +17,12 @@ def extract_eeg(data):
     y = to_vectors[1:]  # eeg
     x = np.array(x)
     y = np.transpose(np.array(y))
-    ny_pow = np.vectorize(to_pow)(y)
+    y_linear = np.vectorize(to_pow)(y)
 
-    y_mean_non_log = np.mean(ny_pow, axis=1)
+    y_mean_linear = np.mean(y_linear, axis=1)
+    y_mean_log10 = np.log10(y_mean_linear)
     x_md = md.date2num(x)
-    return x_md, y_mean_non_log,
+    return x_md, y_mean_linear, y_mean_log10
 
 
 def print_mean_by_cue(x_alpha, y_alpha, x_cues):
@@ -29,12 +30,15 @@ def print_mean_by_cue(x_alpha, y_alpha, x_cues):
     sub_tot = 0
     num = 0
     cue_index = 0
+    last_entry = x_alpha[0]
     for i, entry in np.ndenumerate(x_alpha):
         if cue_index > len(x_cues) - 1:
             sub_tot += y_alpha[i]
             num += 1
         elif entry > x_cues[cue_index]:
-            mean_by_cue.append(sub_tot / num)
+            mean_by_cue.append({num: sub_tot / num})
+            # plt.axhline(y=sub_tot / num, xmin=last_entry, xmax=entry, c="green", linewidth=1,  zorder=0)
+            last_entry = entry
             sub_tot = 0
             num = 0
             cue_index += 1
@@ -45,11 +49,15 @@ def print_mean_by_cue(x_alpha, y_alpha, x_cues):
     print mean_by_cue
 
 
-def plot_lines_in_cues_timestamps(y_alpha_non_log, x_cues):
-    min_val = min(y_alpha_non_log)
-    max_val = max(y_alpha_non_log)
+def plot_lines_in_cues_timestamps(y_alpha_linear, x_cues):
+    max_val = max(y_alpha_linear)
     for i in x_cues:
+        print i
         plt.axvline(x=i, ymin=0, ymax=max_val, c="blue", linewidth=1, zorder=0)
+
+
+def plotGraph(x_alpha, y_alpha_linear, False, x_cues):
+    pass
 
 
 def generate_graph(trial_id):
@@ -64,27 +72,20 @@ def generate_graph(trial_id):
         "select server_timestamp,cue_name from {} where trial_id={}".format(CUES_TABLE, trial_id)).fetchall()
     split2 = zip(*trial_ticks)
 
-    x_alpha, y_alpha_non_log = extract_eeg(alpha_data)
+    x_alpha, y_alpha_linear, y_alpha_log10 = extract_eeg(alpha_data)
     x_cues = md.date2num(split2[0])
-
-    y2_cues = []
-    for i in range(5):
-        y2_cues.append(0)
 
     plt.figure(1)
     plt.subplot(211)
 
     format_x_axis(False)
 
-    # plt.plot(x_alpha, y_alpha, 'r--', x_beta, y_beta, 'b--', x_cues, y2_cues, 'g^', linewidth=1.0)
-    plt.plot(x_alpha, y_alpha_non_log, 'r--', linewidth=1.0)
+    plotGraph(x_alpha, y_alpha_linear, False, x_cues)
+    plt.plot(x_alpha, y_alpha_linear, 'r--', linewidth=1.0)
+    plt.plot(x_alpha, y_alpha_log10, 'g--', linewidth=1.0)
 
-    # plt.plot((x_alpha[30], min_val), (x_alpha[30], max_val), 'k-')
-    # ax1 = plt.subplot()
-
-    #
-    print_mean_by_cue(x_alpha, y_alpha_non_log, x_cues)
-    plot_lines_in_cues_timestamps(y_alpha_non_log, x_cues)
+    print_mean_by_cue(x_alpha, y_alpha_linear, x_cues)
+    plot_lines_in_cues_timestamps(y_alpha_linear, x_cues)
 
     plt.show()
 
