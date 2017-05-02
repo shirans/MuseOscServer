@@ -52,12 +52,17 @@ def print_mean_by_cue(x_alpha, y_alpha, x_cues):
 def plot_lines_in_cues_timestamps(y_alpha_linear, x_cues):
     max_val = max(y_alpha_linear)
     for i in x_cues:
-        print i
         plt.axvline(x=i, ymin=0, ymax=max_val, c="blue", linewidth=1, zorder=0)
 
 
-def plotGraph(x_alpha, y_alpha_linear, False, x_cues):
-    pass
+def plotGraph(x_alpha, y_alpha, is_log_scale, x_cues, style):
+    fig = plt.figure()
+    fig.add_subplot(111)
+    format_x_axis(is_log_scale)
+    plt.plot(x_alpha, y_alpha, style, linewidth=1.0)
+
+    print_mean_by_cue(x_alpha, y_alpha, x_cues)
+    plot_lines_in_cues_timestamps(y_alpha, x_cues)
 
 
 def generate_graph(trial_id):
@@ -75,18 +80,11 @@ def generate_graph(trial_id):
     x_alpha, y_alpha_linear, y_alpha_log10 = extract_eeg(alpha_data)
     x_cues = md.date2num(split2[0])
 
-    plt.figure(1)
-    plt.subplot(211)
+    # plt.figure(1)
+    # plt.subplot(211)
 
-    format_x_axis(False)
-
-    plotGraph(x_alpha, y_alpha_linear, False, x_cues)
-    plt.plot(x_alpha, y_alpha_linear, 'r--', linewidth=1.0)
-    plt.plot(x_alpha, y_alpha_log10, 'g--', linewidth=1.0)
-
-    print_mean_by_cue(x_alpha, y_alpha_linear, x_cues)
-    plot_lines_in_cues_timestamps(y_alpha_linear, x_cues)
-
+    plotGraph(x_alpha, y_alpha_linear, False, x_cues, 'r--')
+    plotGraph(x_alpha, y_alpha_log10, True, x_cues, 'g--')
     plt.show()
 
     print "end"
