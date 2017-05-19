@@ -16,7 +16,7 @@
         </plugins>
     </build>
     <groupId>shiran</groupId>
-    <artifactId>com.shiran</artifactId>
+    <artifactId>com.experiment-server</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <!--<groupId>oscP5</groupId>-->

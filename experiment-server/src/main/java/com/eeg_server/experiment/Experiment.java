@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
  */
 public class Experiment {
     private static final Logger logger = LogManager.getLogger(Experiment.class);
-    private final int sleepInterval;
-    private int sleepFactor;
+    private final int intervalsBetweenSignalsMs;
+    private int randomSleepFactorMs;
     private int numIterations;
-    private int randomize;
+    private int percentageOfRareEvents;
 
     private PlayingThread playingThread;
 
@@ -30,11 +30,11 @@ public class Experiment {
         Experiment.isFinished = isFinished;
     }
 
-    protected Experiment(int sleepInterval, int sleepFactor, int numIterations, int randomize) {
-        this.sleepInterval = sleepInterval;
-        this.sleepFactor = sleepFactor;
+    protected Experiment(int intervalsBetweenSignalsMs, int randomSleepFactorMs, int numIterations, int percentageOfRareEvents) {
+        this.intervalsBetweenSignalsMs = intervalsBetweenSignalsMs;
+        this.randomSleepFactorMs = randomSleepFactorMs;
         this.numIterations = numIterations;
-        this.randomize = randomize;
+        this.percentageOfRareEvents = percentageOfRareEvents;
     }
 
     private static Boolean isFinished = false;
@@ -43,7 +43,7 @@ public class Experiment {
 
     public void start() {
         logger.info("starting Playing thread");
-        playingThread = new PlayingThread(this.sleepInterval, this.sleepFactor, this.numIterations, this.randomize);
+        playingThread = new PlayingThread(this.intervalsBetweenSignalsMs, this.randomSleepFactorMs, this.numIterations, this.percentageOfRareEvents);
         this.events = playingThread.getEvents();
         playingThread.start();
     }

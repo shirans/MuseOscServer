@@ -11,7 +11,7 @@ public class OddBallExperiment extends Experiment {
 
     private static final Logger logger = LogManager.getLogger(OddBallExperiment.class);
 
-    public OddBallExperiment(int sleepFactor, int interval, int numIterations, int randomize) {
-        super(sleepFactor, interval, numIterations, randomize);
+    public OddBallExperiment(int intervalsBetweenSignalsMs, int randomSleepFactorMs, int numIterations, int percentageOfRareEvents) {
+        super(intervalsBetweenSignalsMs, randomSleepFactorMs, numIterations, percentageOfRareEvents);
     }
 }

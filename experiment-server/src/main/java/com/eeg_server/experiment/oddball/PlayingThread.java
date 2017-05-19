@@ -21,8 +21,8 @@ public class PlayingThread extends Thread {
     private static final Logger logger = LogManager.getLogger(PlayingThread.class);
     private static final String BEEP_5 = "beep-5.wav";
     private static final String BEEP_1 = "beeps-1.wav";
-    private final int sleepFactor;
-    private final int randomize;
+    private final int randomSleepFactorMs;
+    private final int percentageOfRareEvents;
     private AudioInputStream inputStream_5;
     private AudioInputStream inputStream_1;
     Clip clip1;
@@ -31,15 +31,15 @@ public class PlayingThread extends Thread {
     private static int counter = 0;
     private final int numIterations;
     private Random randomGenerator = new Random();
-    private long sleepInterval;
+    private long intervalsBetweenSignalsMillis;
 
     private EventListener lineListener = new EventListener();
 
-    public PlayingThread(long sleepInterval, int sleepFactor, int numIterations, int randomize) {
-        this.sleepInterval = sleepInterval;
+    public PlayingThread(long intervalsBetweenSignalsMs, int randomSleepFactorMs, int numIterations, int percentageOfRareEvents) {
+        this.intervalsBetweenSignalsMillis = intervalsBetweenSignalsMs;
         this.numIterations = numIterations;
-        this.sleepFactor = sleepFactor;
-        this.randomize = randomize;
+        this.randomSleepFactorMs = randomSleepFactorMs;
+        this.percentageOfRareEvents = percentageOfRareEvents;
         try {
             inputStream_5 = AudioSystem.getAudioInputStream(
                     RunExperiment.class.getResourceAsStream(BEEP_5));
@@ -57,25 +57,26 @@ public class PlayingThread extends Thread {
     public void run() {
         while (counter < numIterations) {
             System.out.println("counter: " + counter);
-            if (randomize == 0) {
+            if (percentageOfRareEvents == 0) {
                 logger.info("alpha. Playing clip 1");
                 play(Type.Frequent, clip1, lineListener);
             } else {
-                int rand = randomGenerator.nextInt(9);
-                if (rand > randomize) {
-                    logger.info("playing Rare. random:" + rand);
-                    play(Type.Rare, clip1, lineListener);
-                } else {
+                int rand = randomGenerator.nextInt(100);
+                if (rand >= percentageOfRareEvents) {
                     logger.info("playing Frequent:" + rand);
                     play(Type.Frequent, clip5, lineListener);
+                } else {
+
+                    logger.info("playing Rare. random:" + rand);
+                    play(Type.Rare, clip1, lineListener);
                 }
             }
 
             waitNext();
             counter++;
             try {
-                int randSleep = randomGenerator.nextInt(9);
-                Thread.sleep(sleepInterval * 1000 + sleepFactor * 1000 * randSleep / 10);
+                int randSleep = randomGenerator.nextInt(randomSleepFactorMs ) + 10;
+                Thread.sleep(intervalsBetweenSignalsMillis + randSleep);
             } catch (InterruptedException e) {
                 logger.error(e);
             }

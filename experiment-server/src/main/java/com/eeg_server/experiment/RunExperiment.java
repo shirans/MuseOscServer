@@ -17,14 +17,14 @@ public class RunExperiment {
 
     private static final Logger logger = LogManager.getLogger(RunExperiment.class);
 
-    public static ExperimentType experimentType = ExperimentType.Alpha;
+    public static ExperimentType experimentType = ExperimentType.OddBall_P300;
 
     public static void main(String args[]) throws InterruptedException, IOException {
         System.setProperty("java.awt.headless", "true");
         EegServer server = new MuseEegServer();
         Experiment experiment;
-        if (ExperimentType.OddBall.equals(experimentType)) {
-            experiment = new OddBallExperiment(7,0, 1,6);
+        if (ExperimentType.OddBall_P300.equals(experimentType)) {
+            experiment = new OddBallExperiment(600, 100, 6000, 15);
         } else {
             experiment = new AlphaWave(10);
         }
@@ -33,7 +33,7 @@ public class RunExperiment {
         while (!experiment.isFinished()) {
             logger.info("num sound events:" + experiment.getEventsSize());
             logger.info("eeg messages:" + server.getEventsSize());
-            Thread.sleep(2000);
+            Thread.sleep(30 * 1000);
         }
         server.stopRecord();
         Thread.sleep(2000);

@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class MuseEegServer implements EegServer {
                 if (others.contains(str)) {
                     return;
                 }
-                logger.debug("got event of type:" + str);
+                logger.debug("got event of type:" + str + "with argumetns:" + Arrays.toString(msg.arguments()));
                 others.add(str);
 
                 return;
