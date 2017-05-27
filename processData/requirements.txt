@@ -1,0 +1,3 @@
+Matplotlib==2.0.0rc1
+coloredlogs
+ntplib=0.3.3

@@ -13,3 +13,13 @@ hs_err_pid*
 
 #idea
 .idea/*
+.iml
+
+.classpath
+.project
+.settings/
+/target/**
+muse-server/.idea/misc.xml
+muse-server/.idea/modules.xml
+muse-server/.idea/muse-server.iml
+muse-server/.idea/workspace.xml

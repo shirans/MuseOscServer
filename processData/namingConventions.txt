@@ -1,0 +1,6 @@
+methods:
+ - Use the function naming rules: lowercase with words separated by underscores as necessary to improve readability.
+ - Use one leading underscore only for non-public methods and instance variables.
+
+Constants:
+- Constants are usually defined on a module level and written in all capital letters with underscores separating words. Examples include MAX_OVERFLOW and TOTAL .
